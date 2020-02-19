@@ -6,6 +6,16 @@
     UNITY_DECLARE_TEX2D(_MainTex); float4 _MainTex_ST; float4 _MainTex_TexelSize;
     sampler2D _PoiGrab;
     float _Clip;
+
+    #ifdef HAI_HANDHOLDING_SHADER_IK_VERT
+        float _EnableFakeArm;
+        float _BoneLength;
+        float _ExtraForearmLength;
+        float _ExtraGrabRatio;
+        float _ShaderIKTargetLightIntensity;
+        float _VertexScale;
+        int _IsLeftArm;
+    #endif
     
     //Structs
     struct appdata

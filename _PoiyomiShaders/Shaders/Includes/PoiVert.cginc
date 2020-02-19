@@ -28,7 +28,33 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-        
+
+        #ifdef HAI_HANDHOLDING_SHADER_IK_VERT
+            #include "../../../HaiHandholdingShaderIK/HaiHandholdingShaderIK.cginc"
+
+            if (_EnableFakeArm > 0.5)
+            {
+                v.vertex = transformArm(
+                   float4(v.vertex.xyz * _VertexScale, 1),
+                   v.color,
+                   _ShaderIKTargetLightIntensity,
+                   true,
+                   float4(0.001, (isLeftArm ? -1 : 1) * -0.002, -0.003, 1) + float4(
+                       sin(_Time.y * 0.3) * 0.00002,
+                       sin(_Time.y * 0.43) * 0.000035,
+                       sin(_Time.y * 1.24) * 0.00015, 0),
+                   _BoneLength / 1000000,
+                   (_BoneLength + _ExtraForearmLength) / 1000000,
+                   (_BoneLength * _ExtraGrabRatio + _ExtraForearmLength) / 1000000,
+                   isLeftArm
+               )
+            }
+            else
+            {
+                v.vertex = float4(0, 0, 0, 0);
+            }
+            #endif
+
         #ifdef _REQUIRE_UV2 //POI_MIRROR
             applyMirrorRenderVert(v.vertex);
         #endif
