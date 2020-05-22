@@ -7,7 +7,7 @@
     #include "AutoLight.cginc"
     #include "Poicludes.cginc"
     #include "PoiHelpers.cginc"
-    #include "PoiOutlineVert.cginc"
+    #include "PoiOutlineVertHSIK.cginc"
     #ifdef _ALPHABLEND_ON
         #include "PoiDissolve.cginc"
     #endif

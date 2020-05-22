@@ -1,4 +1,4 @@
-Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
+Shader ".poiyomi/Toon_HandholdingShaderIK/Advanced/Outlines Cutout"
 {
     Properties
     {
@@ -632,6 +632,14 @@ Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
         [Enum(Off, 0, finalSpecular, 1, tangentDirectionMap, 2, shiftTexture, 3)] _DebugSpecularData ("Specular Data", Int) = 0
         [Enum(Off, 0, View Dir, 1, Tangent View Dir, 2, Forward Dir, 3, WorldPos, 4, View Dot Normal, 5)] _DebugCameraData ("Camera Data", Int) = 0
         [HideInInspector] m_end_debugOptions ("Debug", Float) = 0
+
+        _EnableFakeArm ("Enable Fake arm (for use with gesture animation)", Float) = 1
+        _BoneLength ("Length of a bone", Float) = 2000
+        _ExtraForearmLength ("Addition length of the forearm and hand", Float) = 500
+        _ExtraGrabRatio ("Ratio of extra reach toward light", Float) = 0.5
+        _ShaderIKTargetLightIntensity ("Shader IK Target light intensity", Float) = 0.1234
+        _VertexScale ("Mesh vertex scale. Editor script uses 1024", Float) = 1024
+        [IntRange] _IsLeftArm ("Is left arm", Range(0, 1)) = 0
     }
 
     //originalEditorCustomEditor "PoiToon"
@@ -706,68 +714,7 @@ Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
             #pragma multi_compile_fog
             #pragma vertex vert
             #pragma fragment frag
-            #include "../Includes/PoiPass.cginc"
-            ENDCG
-
-        }
-
-        Pass
-        {
-            Tags { "LightMode" = "ForwardAdd" }
-            Stencil
-            {
-                Ref [_StencilRef]
-                Comp [_StencilCompareFunction]
-                Pass [_StencilPassOp]
-                Fail [_StencilFailOp]
-                ZFail [_StencilZFailOp]
-            }
-            ZWrite Off
-            Blend One One
-            Cull [_Cull]
-            ZTest [_ZTest]
-            Offset [_ZBias], [_ZBias]
-            CGPROGRAM
-
-            #pragma target 4.0
-            #define FORWARD_ADD_PASS
-            #define CUTOUT
-            // UV Distortion
-            #pragma shader_feature USER_LUT
-            #pragma shader_feature _PARALLAX_MAP
-            // Mirror
-            #pragma shader_feature _REQUIRE_UV2
-            // Random
-            #pragma shader_feature _SUNDISK_NONE
-            // Dissolve
-            #pragma shader_feature _ALPHABLEND_ON
-            // Panosphere
-            #pragma shader_feature _DETAIL_MULX2
-            // Lighting
-            #pragma shader_feature LOD_FADE_CROSSFADE
-            // Flipbook
-            #pragma shader_feature _SUNDISK_HIGH_QUALITY
-            // Rim Lighting
-            #pragma shader_feature _GLOSSYREFLECTIONS_OFF
-            // Metal
-            #pragma shader_feature _METALLICGLOSSMAP
-            // Matcap
-            #pragma shader_feature _COLORADDSUBDIFF_ON
-            // Specular
-            #pragma shader_feature _SPECGLOSSMAP
-            // SubSurface
-            #pragma shader_feature _TERRAIN_NORMAL_MAP
-            // RGBMask
-            #pragma shader_feature FXAA
-            // Text
-            #pragma shader_feature EFFECT_BUMP
-            // Debug
-            #pragma shader_feature _COLOROVERLAY_ON
-            #pragma multi_compile_instancing
-            #pragma multi_compile_fwdadd_fullshadows
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "../Includes/PoiPass.cginc"
+            #include "../Includes/PoiPassHSIK.cginc"
             ENDCG
 
         }
@@ -809,97 +756,7 @@ Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
             #pragma multi_compile_instancing
             #pragma vertex vert
             #pragma fragment frag
-            #include "../Includes/PoiPassOutline.cginc"
-            ENDCG
-
-        }
-
-        Pass
-        {
-            Tags { "LightMode" = "ShadowCaster" }
-            Stencil
-            {
-                Ref [_StencilRef]
-                Comp [_StencilCompareFunction]
-                Pass [_StencilPassOp]
-                Fail [_StencilFailOp]
-                ZFail [_StencilZFailOp]
-            }
-            ZWrite [_ZWrite]
-            Cull [_Cull]
-            ZTest [_ZTest]
-            Offset [_ZBias], [_ZBias]
-            CGPROGRAM
-
-            #pragma target 4.0
-            #define CUTOUT
-            #define POI_SHADOW
-            // UV Distortion
-            #pragma shader_feature USER_LUT
-            // Flipbook
-            #pragma shader_feature _SUNDISK_HIGH_QUALITY
-            // Mirror
-            #pragma shader_feature _REQUIRE_UV2
-            // Random
-            #pragma shader_feature _SUNDISK_NONE
-            // Dissolve
-            #pragma shader_feature _ALPHABLEND_ON
-            #pragma multi_compile_instancing
-            #pragma vertex vertShadowCaster
-            #pragma fragment fragShadowCaster
-            #include "../Includes/PoiPassShadow.cginc"
-            ENDCG
-
-        }
-
-        Pass
-        {
-            Tags { "LightMode" = "Meta" }
-            Cull Off
-            CGPROGRAM
-
-            #define POI_META_PASS
-            // UV Distortion
-            #pragma shader_feature USER_LUT
-            #pragma shader_feature _PARALLAXMAP
-            // Mirror
-            #pragma shader_feature _REQUIRE_UV2
-            // Random
-            #pragma shader_feature _SUNDISK_NONE
-            // Dissolve
-            #pragma shader_feature _ALPHABLEND_ON
-            // Panosphere
-            #pragma shader_feature _DETAIL_MULX2
-            // Lighting
-            #pragma shader_feature LOD_FADE_CROSSFADE
-            // Flipbook
-            #pragma shader_feature _SUNDISK_HIGH_QUALITY
-            // Rim Lighting
-            #pragma shader_feature _GLOSSYREFLECTIONS_OFF
-            // Enviro Rim
-            #pragma shader_feature _MAPPING_6_FRAMES_LAYOUT
-            // Metal
-            #pragma shader_feature _METALLICGLOSSMAP
-            // Matcap
-            #pragma shader_feature _COLORADDSUBDIFF_ON
-            // Specular
-            #pragma shader_feature _SPECGLOSSMAP
-            // SubSurface
-            #pragma shader_feature _TERRAIN_NORMAL_MAP
-            // Debug
-            #pragma shader_feature _COLOROVERLAY_ON
-            // Glitter
-            #pragma shader_feature _SUNDISK_SIMPLE
-            // RGBMask
-            #pragma shader_feature FXAA
-            // Text
-            #pragma shader_feature EFFECT_BUMP
-            #pragma shader_feature _EMISSION
-            // Clear Coat
-            #pragma shader_feature _COLORCOLOR_ON
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "../Includes/PoiPass.cginc"
+            #include "../Includes/PoiPassOutlineHSIK.cginc"
             ENDCG
 
         }
