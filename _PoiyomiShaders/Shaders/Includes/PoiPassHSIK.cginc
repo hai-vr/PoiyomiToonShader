@@ -120,7 +120,7 @@ TODO: _ALPHAMODULATE_ON
         #include "CGI_PoiBulge.cginc"
     #endif
     
-    #include "PoiVert.cginc"
+    #include "PoiVertHSIK.cginc"
     
     
     #include "CGI_PoiDistanceDithering.cginc"
