@@ -2,6 +2,7 @@
     #define POI_VERT
     
     uint vertexManipulationUV;
+    float _EnableAfk;
     
     void ComputeVertexLightColor(inout v2f i)
     {
@@ -16,7 +17,7 @@
     }
     
     v2f vert(appdata v)
-    {
+    {   
         UNITY_SETUP_INSTANCE_ID(v);
         v2f o;
         
@@ -26,6 +27,21 @@
         UNITY_INITIALIZE_OUTPUT(v2f, o);
         UNITY_TRANSFER_INSTANCE_ID(v, o);
         UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+        #ifdef _AFK_PASS
+            if (_EnableAfk > 0.9
+                || (_EnableAfk > 0.2 && fmod(_Time.y, 1.0) < _EnableAfk)
+                || (_EnableAfk > 0.01 && fmod(_Time.y, 1.0) < _EnableAfk && abs(_SinTime.w * 1.7) < 0.5))
+            {
+                v.vertex = v.vertex + float4(0.02, 0, 0.02, 0);
+            }
+            else
+            {
+                float discarded = sqrt(-1);
+                o.pos.x = discarded;
+                return o;
+            }
+        #endif
         
         #ifdef _REQUIRE_UV2 //POI_MIRROR
             applyMirrorRenderVert(v.vertex);

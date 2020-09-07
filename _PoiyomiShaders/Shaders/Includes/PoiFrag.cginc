@@ -9,6 +9,15 @@
     
     float4 frag(v2f i, float facing: VFACE): SV_Target
     {
+        #ifdef _AFK_PASS
+            float stepTime = frac(sin(dot(floor(_Time.y * 5),float3(12.9898,78.233,45.5432) )) * 43758.5453);
+            float stepTime2 = frac(sin(dot(floor(_Time.y * 6),float3(12.9898,78.233,45.5432) )) * 43758.5453);
+            if (fmod(i.pos.y + stepTime * 43, 50) < 40 && fmod(i.pos.y + stepTime2 * 89, 120) < 70)
+            {
+                discard;
+            }
+        #endif
+
         #ifndef POI_LIGHTING
             #ifdef FORWARD_ADD_PASS
                 return 0;

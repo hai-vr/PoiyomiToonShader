@@ -647,6 +647,8 @@ Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
         [Enum(Off, 0, Attenuation, 1, Direct Lighting, 2, Indirect Lighting, 3, light Map, 4, Ramped Light Map, 5, Final Lighting, 6)] _DebugLightingData ("Lighting Data", Int) = 0
         [Enum(Off, 0, View Dir, 1, Tangent View Dir, 2, Forward Dir, 3, WorldPos, 4, View Dot Normal, 5)] _DebugCameraData ("Camera Data", Int) = 0
         [HideInInspector] m_end_debugOptions ("Debug", Float) = 0
+        
+        _EnableAfk ("Enable Afk Effect", Range(0, 1)) = 0
     }
     
     //originalEditorCustomEditor "PoiToon"
@@ -724,6 +726,79 @@ Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
             ENDCG
             
         }
+
+        Pass
+        {
+            Name "AfkPass"
+            Tags { "LightMode" = "ForwardBase" }
+            Stencil
+            {
+                Ref [_StencilRef]
+                Comp [_StencilCompareFunction]
+                Pass [_StencilPassOp]
+                Fail [_StencilFailOp]
+                ZFail [_StencilZFailOp]
+            }
+            ZWrite [_ZWrite]
+            Cull [_Cull]
+            AlphaToMask On
+            ZTest [_ZTest]
+            Offset [_ZBias], [_ZBias]
+            CGPROGRAM
+            
+            #pragma target 4.0
+            #define FORWARD_BASE_PASS
+            #define CUTOUT
+            // HAI_AfkPass
+            #define _AFK_PASS
+            // UV Distortion
+            #pragma shader_feature USER_LUT
+            #pragma shader_feature _PARALLAXMAP
+            // Mirror
+            #pragma shader_feature _REQUIRE_UV2
+            // Random
+            #pragma shader_feature _SUNDISK_NONE
+            // Dissolve
+            #pragma shader_feature _ALPHABLEND_ON
+            // Panosphere
+            #pragma shader_feature _DETAIL_MULX2
+            // Lighting
+            #pragma shader_feature LOD_FADE_CROSSFADE
+            // Flipbook
+            #pragma shader_feature _SUNDISK_HIGH_QUALITY
+            // Rim Lighting
+            #pragma shader_feature _GLOSSYREFLECTIONS_OFF
+            // Enviro Rim
+            #pragma shader_feature _MAPPING_6_FRAMES_LAYOUT
+            // Metal
+            #pragma shader_feature _METALLICGLOSSMAP
+            // Matcap
+            #pragma shader_feature _COLORADDSUBDIFF_ON
+            // Specular
+            #pragma shader_feature _SPECGLOSSMAP
+            // SubSurface
+            #pragma shader_feature _TERRAIN_NORMAL_MAP
+            // Debug
+            #pragma shader_feature _COLOROVERLAY_ON
+            // Glitter
+            #pragma shader_feature _SUNDISK_SIMPLE
+            // RGBMask
+            #pragma shader_feature FXAA
+            // Text
+            #pragma shader_feature EFFECT_BUMP
+            #pragma shader_feature _EMISSION
+            // Clear Coat
+            #pragma shader_feature _COLORCOLOR_ON
+            #pragma multi_compile_instancing
+            #pragma multi_compile_fwdbase
+            #pragma fragmentoption ARB_precision_hint_fastest
+            #pragma multi_compile_fog
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "../Includes/PoiPass.cginc"
+            ENDCG
+            
+        }
         
         Pass
         {
@@ -746,6 +821,70 @@ Shader ".poiyomi/Toon/Advanced/Outlines Cutout"
             #pragma target 4.0
             #define FORWARD_ADD_PASS
             #define CUTOUT
+            // UV Distortion
+            #pragma shader_feature USER_LUT
+            #pragma shader_feature _PARALLAX_MAP
+            // Mirror
+            #pragma shader_feature _REQUIRE_UV2
+            // Random
+            #pragma shader_feature _SUNDISK_NONE
+            // Dissolve
+            #pragma shader_feature _ALPHABLEND_ON
+            // Panosphere
+            #pragma shader_feature _DETAIL_MULX2
+            // Lighting
+            #pragma shader_feature LOD_FADE_CROSSFADE
+            // Flipbook
+            #pragma shader_feature _SUNDISK_HIGH_QUALITY
+            // Rim Lighting
+            #pragma shader_feature _GLOSSYREFLECTIONS_OFF
+            // Metal
+            #pragma shader_feature _METALLICGLOSSMAP
+            // Matcap
+            #pragma shader_feature _COLORADDSUBDIFF_ON
+            // Specular
+            #pragma shader_feature _SPECGLOSSMAP
+            // SubSurface
+            #pragma shader_feature _TERRAIN_NORMAL_MAP
+            // RGBMask
+            #pragma shader_feature FXAA
+            // Text
+            #pragma shader_feature EFFECT_BUMP
+            // Debug
+            #pragma shader_feature _COLOROVERLAY_ON
+            #pragma multi_compile_instancing
+            #pragma multi_compile_fwdadd_fullshadows
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "../Includes/PoiPass.cginc"
+            ENDCG
+            
+        }
+
+        Pass
+        {
+            Name "AfkForwardAddPass"
+            Tags { "LightMode" = "ForwardAdd" }
+            Stencil
+            {
+                Ref [_StencilRef]
+                Comp [_StencilCompareFunction]
+                Pass [_StencilPassOp]
+                Fail [_StencilFailOp]
+                ZFail [_StencilZFailOp]
+            }
+            ZWrite Off
+            Blend One One
+            Cull [_Cull]
+            ZTest [_ZTest]
+            Offset [_ZBias], [_ZBias]
+            CGPROGRAM
+            
+            #pragma target 4.0
+            #define FORWARD_ADD_PASS
+            #define CUTOUT
+            // HAI_AfkPass
+            #define _AFK_PASS
             // UV Distortion
             #pragma shader_feature USER_LUT
             #pragma shader_feature _PARALLAX_MAP
